@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#3D1A0A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Blooming Café — Loyalty</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --amber:      #C4832A;
+  --amber-pale: #F0C878;
+  --amber-dim:  #8B5A1A;
+  --dark:       #F5E6D3;
+  --dark-2:     #3D1A0A;
+  --dark-3:     #4E220D;
+  --surface:    #3D1A0A;
+  --text:       #F5E6D3;
+  --text-muted: #C4A882;
+  --text-dim:   #8B6B45;
+  --radius:     16px;
+  --radius-sm:  10px;
+}
+
+html, body {
+  min-height: 100%; min-height: 100dvh;
+  background: var(--dark);
+  font-family: 'Jost', sans-serif;
+  color: var(--text);
+  overscroll-behavior-y: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+body { display: flex; align-items: flex-start; justify-content: center; padding: 24px 20px 40px; }
+
+.app {
+  width: 100%; max-width: 400px;
+  display: flex; flex-direction: column; align-items: center;
+  position: relative;
+}
+
+.app::before {
+  content: '';
+  position: fixed; top: -80px; left: 50%;
+  transform: translateX(-50%);
+  width: 340px; height: 340px;
+  background: radial-gradient(circle, rgba(92,45,14,0.55) 0%, transparent 65%);
+  pointer-events: none; z-index: 0;
+}
+
+/* ── HEADER ── */
+.header { text-align: center; margin-bottom: 32px; position: relative; z-index: 1; }
+
+.logo-ring {
+  width: 96px; height: 96px; border-radius: 50%;
+  border: 1.5px solid rgba(92,45,14,0.5);
+  background: rgba(92,45,14,0.08);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 18px;
+}
+.logo-ring img {
+  width: 74px; height: 74px; object-fit: contain;
+  filter: brightness(0.3) sepia(1) saturate(3) hue-rotate(5deg);
+}
+
+.brand-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px; font-weight: 600;
+  letter-spacing: 0.07em; color: var(--dark-2); line-height: 1;
+}
+.brand-sub {
+  font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--amber-dim); margin-top: 7px;
+}
+.divider {
+  width: 36px; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(196,131,42,0.4), transparent);
+  margin: 16px auto 0;
+}
+
+/* ── STEP DOTS ── */
+.steps {
+  display: flex; align-items: center; justify-content: center;
+  gap: 7px; margin-bottom: 22px; width: 100%;
+  position: relative; z-index: 1;
+}
+.step-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: rgba(196,131,42,0.2);
+  transition: all 0.3s;
+}
+.step-dot.active { background: var(--amber); width: 22px; border-radius: 4px; }
+
+/* ── CARD ── */
+.card {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid rgba(196,131,42,0.14);
+  border-radius: var(--radius);
+  padding: 26px 22px;
+  position: relative; z-index: 1;
+  display: none;
+}
+.card.active { display: block; animation: fadeUp 0.3s ease both; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.card-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px; font-weight: 600;
+  color: var(--amber-pale); margin-bottom: 6px;
+}
+.card-sub {
+  font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 20px;
+}
+
+/* ── INPUT ── */
+.input-label {
+  font-size: 10px; font-weight: 600;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--text-muted); display: block; margin-bottom: 9px;
+}
+.phone-row {
+  display: flex; align-items: stretch;
+  background: var(--dark-3);
+  border: 1.5px solid rgba(196,131,42,0.22);
+  border-radius: var(--radius-sm); overflow: hidden;
+  transition: border-color 0.2s;
+}
+.phone-row:focus-within { border-color: rgba(196,131,42,0.6); }
+.phone-prefix {
+  padding: 0 14px; font-size: 15px; font-weight: 500;
+  color: var(--amber);
+  background: rgba(196,131,42,0.08);
+  border-right: 1.5px solid rgba(196,131,42,0.18);
+  display: flex; align-items: center;
+  white-space: nowrap; user-select: none; flex-shrink: 0;
+}
+.phone-input {
+  flex: 1; border: none; outline: none; background: transparent;
+  padding: 0 16px; height: 56px;
+  font-size: 20px; font-family: 'Jost', sans-serif;
+  color: var(--text); letter-spacing: 0.05em; min-width: 0;
+}
+.phone-input::placeholder { color: var(--text-dim); font-size: 15px; }
+
+/* ── CATEGORY TOGGLE ── */
+.cat-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px;
+}
+.cat-btn {
+  height: 56px; border-radius: var(--radius-sm);
+  border: 1.5px solid rgba(196,131,42,0.22);
+  background: var(--dark-3);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  cursor: pointer; transition: border-color 0.2s, background 0.2s;
+  touch-action: manipulation; position: relative;
+}
+.cat-btn:active { transform: scale(0.97); }
+.cat-btn.selected {
+  border-color: var(--amber);
+  background: rgba(196,131,42,0.08);
+}
+.cat-btn.selected::after {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--amber);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+}
+.cat-icon { display: flex; align-items: center; justify-content: center; }
+.cat-icon svg { width: 22px; height: 22px; }
+.cat-label {
+  font-size: 11px; font-weight: 500; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--text-muted);
+}
+.cat-btn.selected .cat-label { color: var(--amber-pale); }
+
+/* ── TEXT INPUT ── */
+.text-input {
+  width: 100%; height: 52px;
+  background: var(--dark-3);
+  border: 1.5px solid rgba(196,131,42,0.22);
+  border-radius: var(--radius-sm);
+  outline: none; padding: 0 16px;
+  font-size: 15px; font-family: 'Jost', sans-serif;
+  color: var(--text); letter-spacing: 0.02em;
+  transition: border-color 0.2s;
+}
+.text-input:focus { border-color: rgba(196,131,42,0.6); }
+.text-input::placeholder { color: var(--text-dim); }
+
+/* ── BUTTON ── */
+.btn {
+  width: 100%; height: 56px;
+  background: var(--amber); border: none;
+  border-radius: var(--radius-sm);
+  font-family: 'Jost', sans-serif;
+  font-size: 13px; font-weight: 500;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--dark-2); cursor: pointer; margin-top: 16px;
+  transition: background 0.2s, transform 0.12s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  touch-action: manipulation;
+}
+.btn:active { transform: scale(0.975); background: #D9973E; }
+.btn:disabled { background: var(--dark-3); color: var(--text-dim); cursor: not-allowed; }
+
+.btn-back {
+  width: 100%; height: 46px;
+  background: transparent;
+  border: 1px solid rgba(196,131,42,0.2);
+  border-radius: var(--radius-sm);
+  font-family: 'Jost', sans-serif;
+  font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--text-dim); cursor: pointer; margin-top: 10px;
+  touch-action: manipulation;
+  transition: border-color 0.2s, color 0.2s;
+}
+.btn-back:active { border-color: var(--amber); color: var(--amber); }
+
+/* ── SPINNER ── */
+.spinner {
+  width: 20px; height: 20px;
+  border: 2px solid rgba(61,26,10,0.25);
+  border-top-color: var(--dark-2);
+  border-radius: 50%; animation: spin 0.7s linear infinite; display: none;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── ERROR ── */
+.error-msg {
+  font-size: 13px; color: #D06050;
+  background: rgba(208,96,80,0.08);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px; margin-top: 10px; display: none;
+}
+.error-msg.show { display: block; }
+
+/* ── SUCCESS ── */
+.success-screen {
+  width: 100%; text-align: center;
+  position: relative; z-index: 1;
+  display: none; flex-direction: column; align-items: center;
+  animation: fadeUp 0.35s ease both;
+}
+.success-screen.show { display: flex; }
+
+.check-ring {
+  width: 76px; height: 76px; border-radius: 50%;
+  background: rgba(196,131,42,0.08);
+  border: 1.5px solid rgba(196,131,42,0.3);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 20px;
+}
+.check-ring svg { width: 34px; height: 34px; }
+
+.success-msg {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px; font-weight: 500; font-style: italic;
+  color: var(--text); line-height: 1.5;
+  background: var(--surface);
+  border-left: 3px solid var(--amber);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: 16px 20px; margin-bottom: 16px;
+  width: 100%; text-align: left;
+}
+
+.order-tag {
+  background: var(--surface);
+  border: 1px solid rgba(196,131,42,0.2);
+  border-radius: var(--radius-sm);
+  padding: 12px 18px; margin-bottom: 16px;
+  width: 100%; display: flex; align-items: center; gap: 12px;
+}
+.order-tag-icon { flex-shrink: 0; }
+.order-tag-icon svg { width: 20px; height: 20px; }
+.order-tag-text {
+  font-size: 13px; color: var(--text-muted); letter-spacing: 0.04em;
+}
+.order-tag-text strong {
+  display: block; font-size: 15px; font-weight: 500;
+  color: var(--amber-pale); letter-spacing: 0.02em; margin-bottom: 2px;
+}
+
+.visit-badge {
+  background: var(--surface);
+  border: 1px solid rgba(196,131,42,0.18);
+  border-radius: var(--radius);
+  padding: 20px 28px;
+  margin-bottom: 20px; width: 100%;
+  display: flex; align-items: center; justify-content: center; gap: 16px;
+}
+.visit-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 56px; font-weight: 700;
+  color: var(--amber-pale); line-height: 1;
+}
+.visit-label {
+  font-size: 12px; font-weight: 500;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--text-muted); line-height: 1.5;
+}
+
+.btn-done {
+  width: 100%; height: 52px;
+  background: transparent;
+  border: 1px solid rgba(196,131,42,0.3);
+  border-radius: var(--radius-sm);
+  font-family: 'Jost', sans-serif;
+  font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--text-muted); cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+  touch-action: manipulation;
+}
+.btn-done:active { border-color: var(--amber); color: var(--amber); }
+
+/* ── FOOTER ── */
+.footer {
+  margin-top: 28px; text-align: center; position: relative; z-index: 1;
+}
+.footer-line {
+  width: 30px; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(196,131,42,0.3), transparent);
+  margin: 0 auto 10px;
+}
+.footer-text {
+  font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim);
+}
+
+/* ── CONFETTI ── */
+.confetti-wrap {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 999; overflow: hidden;
+}
+.confetti-piece {
+  position: absolute; width: 7px; height: 9px;
+  border-radius: 2px; opacity: 0;
+  animation: fall 2s ease-in forwards;
+}
+@keyframes fall {
+  0%   { opacity: 1; transform: translateY(-10px) rotate(0deg); }
+  100% { opacity: 0; transform: translateY(100vh) rotate(540deg); }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo-ring">
+      <img src="logo.png" alt="Blooming Café"
+        onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+      <svg style="display:none" viewBox="0 0 72 72" fill="none" width="64" height="64">
+        <ellipse cx="36" cy="18" rx="9" ry="13" stroke="#3D1A0A" stroke-width="2"/>
+        <line x1="36" y1="10" x2="36" y2="26" stroke="#3D1A0A" stroke-width="1.8" stroke-linecap="round"/>
+        <ellipse cx="18" cy="36" rx="13" ry="9" stroke="#3D1A0A" stroke-width="2"/>
+        <line x1="10" y1="36" x2="26" y2="36" stroke="#3D1A0A" stroke-width="1.8" stroke-linecap="round"/>
+        <ellipse cx="54" cy="36" rx="13" ry="9" stroke="#3D1A0A" stroke-width="2"/>
+        <line x1="46" y1="36" x2="62" y2="36" stroke="#3D1A0A" stroke-width="1.8" stroke-linecap="round"/>
+        <ellipse cx="36" cy="54" rx="9" ry="13" stroke="#3D1A0A" stroke-width="2"/>
+        <line x1="36" y1="46" x2="36" y2="62" stroke="#3D1A0A" stroke-width="1.8" stroke-linecap="round"/>
+        <circle cx="36" cy="36" r="5" stroke="#3D1A0A" stroke-width="2"/>
+      </svg>
+    </div>
+    <div class="brand-name">Blooming Café</div>
+    <div class="brand-sub">Loyalty Programme</div>
+    <div class="divider"></div>
+  </div>
+
+  <!-- STEP DOTS -->
+  <div class="steps">
+    <div class="step-dot active" id="dot-1"></div>
+    <div class="step-dot" id="dot-2"></div>
+    <div class="step-dot" id="dot-3"></div>
+  </div>
+
+  <!-- STEP 1: PHONE -->
+  <div class="card active" id="card-phone">
+    <div class="card-title">Enter your number</div>
+    <div class="card-sub">We'll record your visit and track how many times you've been here.</div>
+
+    <label class="input-label" for="phone">Phone Number</label>
+    <div class="phone-row">
+      <div class="phone-prefix">+250</div>
+      <input
+        class="phone-input" id="phone"
+        type="tel" inputmode="numeric"
+        placeholder="788 123 456"
+        maxlength="15" autocomplete="tel"
+      >
+    </div>
+    <div class="error-msg" id="phone-error"></div>
+
+    <button class="btn" id="btn-next" onclick="handlePhone()">
+      <span id="btn-next-text">Continue</span>
+      <div class="spinner" id="btn-next-spinner"></div>
+    </button>
+  </div>
+
+  <!-- STEP 2: ORDER -->
+  <div class="card" id="card-order">
+    <div class="card-title">What did you have?</div>
+    <div class="card-sub">Choose the category then type what you ordered.</div>
+
+    <label class="input-label">Category</label>
+    <div class="cat-row">
+      <div class="cat-btn" id="cat-drink" onclick="selectCat('drink')">
+        <div class="cat-icon">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M5 3h14l-2 10H7L5 3z" stroke="#C4832A" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M7 13c0 3.3 2.2 6 5 6s5-2.7 5-6" stroke="#C4832A" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M15 6c1 0 2 .5 2 1.5S16 9 15 9" stroke="#C4832A" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="cat-label">Drink</div>
+      </div>
+      <div class="cat-btn" id="cat-food" onclick="selectCat('food')">
+        <div class="cat-icon">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M4 11c0-4 3.6-7 8-7s8 3 8 7" stroke="#C4832A" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M3 14c0-1.1.9-3 2-3 1.4 0 2.5 1.5 4 2 1 .4 2.4.5 3 .5s2-.1 3-.5c1.5-.5 2.6-2 4-2 1.1 0 2 1.9 2 3s-1.2 3-9 3-9-1.9-9-3z" stroke="#C4832A" stroke-width="1.5" fill="none"/>
+            <path d="M9 8.5c.6-1.2 1.6-1.8 3-1.8s2.4.5 3 1.8" stroke="#C4832A" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="cat-label">Food</div>
+      </div>
+      <div class="cat-btn" id="cat-both" onclick="selectCat('both')" style="grid-column: span 2;">
+        <div class="cat-icon" style="flex-direction:row;gap:8px;display:flex;">
+          <svg viewBox="0 0 24 24" fill="none" width="18" height="18">
+            <path d="M5 3h14l-2 10H7L5 3z" stroke="#C4832A" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M7 13c0 3.3 2.2 6 5 6s5-2.7 5-6" stroke="#C4832A" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <svg viewBox="0 0 24 24" fill="none" width="18" height="18">
+            <path d="M4 11c0-4 3.6-7 8-7s8 3 8 7" stroke="#C4832A" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M3 14c0-1.1.9-3 2-3 1.4 0 2.5 1.5 4 2 1 .4 2.4.5 3 .5s2-.1 3-.5c1.5-.5 2.6-2 4-2 1.1 0 2 1.9 2 3s-1.2 3-9 3-9-1.9-9-3z" stroke="#C4832A" stroke-width="1.5" fill="none"/>
+          </svg>
+        </div>
+        <div class="cat-label">Drink & Food</div>
+      </div>
+    </div>
+
+    <label class="input-label" for="item-input">What specifically?</label>
+    <input
+      class="text-input" id="item-input"
+      type="text" inputmode="text"
+      placeholder="e.g. Latte, Croissant, Juice..."
+      maxlength="60" autocomplete="off"
+    >
+
+    <div class="error-msg" id="order-error"></div>
+
+    <button class="btn" id="btn-confirm" onclick="handleOrder()">
+      <span id="btn-confirm-text">Check In</span>
+      <div class="spinner" id="btn-confirm-spinner"></div>
+    </button>
+    <button class="btn-back" onclick="goBack()">← Back</button>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="success-screen" id="success-screen">
+    <div class="check-ring">
+      <svg viewBox="0 0 34 34" fill="none">
+        <path d="M6 17l7.5 7.5L28 9" stroke="#C4832A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <div class="success-msg" id="success-msg">Welcome to Blooming Café!</div>
+
+    <div class="order-tag" id="order-tag">
+      <div class="cat-icon order-tag-icon" id="order-tag-icon">
+        <svg viewBox="0 0 24 24" fill="none" width="20" height="20">
+          <path d="M5 3h14l-2 10H7L5 3z" stroke="#C4832A" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M7 13c0 3.3 2.2 6 5 6s5-2.7 5-6" stroke="#C4832A" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="order-tag-text">
+        <strong id="order-item-name">Latte</strong>
+        <span id="order-cat-label">Drink</span>
+      </div>
+    </div>
+
+    <div class="visit-badge">
+      <div class="visit-num" id="visit-num">1</div>
+      <div class="visit-label">total<br>visits</div>
+    </div>
+
+    <button class="btn-done" onclick="reset()">Done</button>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-line"></div>
+    <div class="footer-text">Blooming Café · Kigali, Rwanda</div>
+  </div>
+
+</div>
+
+<div class="confetti-wrap" id="confetti"></div>
+
+<script>
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzQHsYhZspNRYI9jiZxp2o0kdskdAdOUXwYsC5HM4TOZ1UURACKQr-wflrSuSconi7x/exec';
+
+let currentPhone = '';
+let currentCat   = '';
+
+// Enter key on phone
+document.getElementById('phone').addEventListener('keydown', e => {
+  if (e.key === 'Enter') handlePhone();
+});
+// Enter key on item
+document.getElementById('item-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') handleOrder();
+});
+
+// ── JSONP ──────────────────────────────────────────────────
+function jsonp(url) {
+  return new Promise((resolve, reject) => {
+    const cb     = '_cb_' + Date.now();
+    const script = document.createElement('script');
+    const timer  = setTimeout(() => { cleanup(); reject(new Error('Timeout')); }, 15000);
+    window[cb]   = data => { cleanup(); resolve(data); };
+    function cleanup() {
+      clearTimeout(timer); delete window[cb];
+      if (script.parentNode) script.parentNode.removeChild(script);
+    }
+    script.onerror = () => { cleanup(); reject(new Error('Network error')); };
+    script.src = url + '&callback=' + cb;
+    document.head.appendChild(script);
+  });
+}
+
+// ── STEP 1: validate phone, go to step 2 ──────────────────
+function handlePhone() {
+  const raw = document.getElementById('phone').value.trim();
+  const err = document.getElementById('phone-error');
+  err.classList.remove('show');
+
+  const cleaned = raw.replace(/[\s\-\(\)]/g, '').replace(/^(\+?250|0)/, '');
+  if (!cleaned || cleaned.length < 8 || !/^\d+$/.test(cleaned)) {
+    err.textContent = 'Please enter a valid number, e.g. 788 123 456';
+    err.classList.add('show');
+    return;
+  }
+
+  currentPhone = '+250' + cleaned;
+  showStep(2);
+}
+
+// ── STEP 2: category selection ─────────────────────────────
+function selectCat(cat) {
+  currentCat = cat;
+  document.getElementById('cat-drink').classList.toggle('selected', cat === 'drink');
+  document.getElementById('cat-food').classList.toggle('selected', cat === 'food');
+  document.getElementById('cat-both').classList.toggle('selected', cat === 'both');
+  document.getElementById('order-error').classList.remove('show');
+
+  const input = document.getElementById('item-input');
+  if (cat === 'drink')      input.placeholder = 'e.g. Latte, Cappuccino, Juice...';
+  else if (cat === 'food')  input.placeholder = 'e.g. Croissant, Sandwich, Cake...';
+  else                      input.placeholder = 'e.g. Latte + Croissant...';
+  input.focus();
+}
+
+// ── STEP 2: submit order ───────────────────────────────────
+async function handleOrder() {
+  const item = document.getElementById('item-input').value.trim();
+  const err  = document.getElementById('order-error');
+  err.classList.remove('show');
+
+  if (!currentCat) {
+    err.textContent = 'Please select Drink or Food.';
+    err.classList.add('show');
+    return;
+  }
+  if (!item) {
+    err.textContent = 'Please type what you ordered.';
+    err.classList.add('show');
+    return;
+  }
+
+  setLoading('confirm', true);
+
+  try {
+    const url  = `${APPS_SCRIPT_URL}?action=logVisit&phone=${encodeURIComponent(currentPhone)}&category=${encodeURIComponent(currentCat)}&item=${encodeURIComponent(item)}`;
+    const data = await jsonp(url);
+
+    if (data.success) {
+      // Populate success screen
+      document.getElementById('visit-num').textContent   = data.visitCount;
+      document.getElementById('success-msg').textContent = data.message;
+      document.getElementById('order-item-name').textContent = item;
+      document.getElementById('order-cat-label').textContent = currentCat === 'drink' ? 'Drink' : currentCat === 'food' ? 'Food' : 'Drink & Food';
+
+      document.getElementById('order-tag-icon').innerHTML = currentCat === 'food'
+        ? `<svg viewBox="0 0 24 24" fill="none" width="20" height="20"><path d="M4 11c0-4 3.6-7 8-7s8 3 8 7" stroke="#C4832A" stroke-width="1.5" stroke-linecap="round"/><path d="M3 14c0-1.1.9-3 2-3 1.4 0 2.5 1.5 4 2 1 .4 2.4.5 3 .5s2-.1 3-.5c1.5-.5 2.6-2 4-2 1.1 0 2 1.9 2 3s-1.2 3-9 3-9-1.9-9-3z" stroke="#C4832A" stroke-width="1.5" fill="none"/></svg>`
+        : currentCat === 'both'
+        ? `<svg viewBox="0 0 24 24" fill="none" width="20" height="20"><path d="M3 3h8l-1.5 7H4.5L3 3z" stroke="#C4832A" stroke-width="1.4" stroke-linejoin="round"/><path d="M4.5 10c0 2.5 1.7 4.5 4 4.5s4-2 4-4.5" stroke="#C4832A" stroke-width="1.4" stroke-linecap="round"/><path d="M13 6h5l-1.5 6H13" stroke="#C4832A" stroke-width="1.4" stroke-linejoin="round"/><path d="M13 12c0 2 1.3 3.5 3 3.5s3-1.5 3-3.5" stroke="#C4832A" stroke-width="1.4" stroke-linecap="round"/></svg>`
+        : `<svg viewBox="0 0 24 24" fill="none" width="20" height="20"><path d="M5 3h14l-2 10H7L5 3z" stroke="#C4832A" stroke-width="1.5" stroke-linejoin="round"/><path d="M7 13c0 3.3 2.2 6 5 6s5-2.7 5-6" stroke="#C4832A" stroke-width="1.5" stroke-linecap="round"/></svg>`;
+
+      showStep(3);
+      launchConfetti();
+    } else {
+      err.textContent = data.error || 'Something went wrong. Try again.';
+      err.classList.add('show');
+    }
+  } catch {
+    err.textContent = 'Connection error. Please try again.';
+    err.classList.add('show');
+  } finally {
+    setLoading('confirm', false);
+  }
+}
+
+function goBack() {
+  showStep(1);
+}
+
+function reset() {
+  currentPhone = ''; currentCat = '';
+  document.getElementById('phone').value      = '';
+  document.getElementById('item-input').value = '';
+  document.getElementById('phone-error').classList.remove('show');
+  document.getElementById('order-error').classList.remove('show');
+  document.getElementById('cat-drink').classList.remove('selected');
+  document.getElementById('cat-food').classList.remove('selected');
+  document.getElementById('cat-both').classList.remove('selected');
+  document.getElementById('success-screen').classList.remove('show');
+  showStep(1);
+}
+
+// ── SHOW STEP ──────────────────────────────────────────────
+function showStep(n) {
+  document.getElementById('card-phone').classList.toggle('active', n === 1);
+  document.getElementById('card-order').classList.toggle('active', n === 2);
+  document.getElementById('success-screen').classList.toggle('show', n === 3);
+
+  // Hide both cards on success
+  if (n === 3) {
+    document.getElementById('card-phone').classList.remove('active');
+    document.getElementById('card-order').classList.remove('active');
+  }
+
+  // Step dots
+  ['dot-1','dot-2','dot-3'].forEach((id, i) => {
+    document.getElementById(id).classList.toggle('active', i + 1 === n);
+  });
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── LOADING ────────────────────────────────────────────────
+function setLoading(btn, on) {
+  document.getElementById('btn-' + btn).disabled = on;
+  document.getElementById('btn-' + btn + '-text').style.display    = on ? 'none'  : 'block';
+  document.getElementById('btn-' + btn + '-spinner').style.display = on ? 'block' : 'none';
+}
+
+// ── CONFETTI ───────────────────────────────────────────────
+function launchConfetti() {
+  const wrap = document.getElementById('confetti');
+  wrap.innerHTML = '';
+  const cols = ['#C4832A','#D9973E','#F0C878','#5C2D0E','#F5E6D3'];
+  for (let i = 0; i < 45; i++) {
+    const p = document.createElement('div');
+    p.className = 'confetti-piece';
+    p.style.cssText = `left:${Math.random()*100}%;background:${cols[i%cols.length]};animation-delay:${Math.random()*0.7}s;animation-duration:${1.4+Math.random()*0.8}s`;
+    wrap.appendChild(p);
+  }
+  setTimeout(() => wrap.innerHTML = '', 3200);
+}
+</script>
+</body>
+</html>
